@@ -124,6 +124,11 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
                         break;
                     }
                     NdefMessage message = formatMapToNDEFMessage(messageMap);
+                    Map messageMap = (Map) writeArgs.get("makeReadOnly");
+                    if (messageMap == null) {
+                        result.error("NFCMissingArguments", "makeReadOnly was not set", null);
+                        break;
+                    }
                     writeNDEF(message);
                     result.success(null);
                 } catch (NfcInFlutterException e) {
@@ -597,7 +602,7 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
         }
     }
 
-    private void writeNDEF(NdefMessage message) throws NfcInFlutterException {
+    private void writeNDEF(NdefMessage message, boolean makeReadOnly) throws NfcInFlutterException {
         Ndef ndef = Ndef.get(lastTag);
         NdefFormatable formatable = NdefFormatable.get(lastTag);
 
@@ -617,6 +622,15 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
                     throw new NfcInFlutterException("IOError", "write to tag error: " + e.getMessage(), null);
                 } catch (FormatException e) {
                     throw new NfcInFlutterException("NDEFBadFormatError", e.getMessage(), null);
+                }
+                if(makeReadOnly){
+                    try {
+                        ndef.makeReadOnly();
+                    } catch (IOException e) {
+                        throw new NfcInFlutterException("IOError", "write to tag error: " + e.getMessage(), null);
+                    } catch (FormatException e) {
+                        throw new NfcInFlutterException("NDEFBadFormatError", e.getMessage(), null);
+                    }
                 }
             } catch (IOException e) {
                 throw new NfcInFlutterException("IOError", e.getMessage(), null);
