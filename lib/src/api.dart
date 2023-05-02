@@ -147,8 +147,8 @@ class NFC {
   /// If you only want to write to the first tag, you can set the [once]
   /// argument to `true` and use the `.first` method on the returned `Stream`.
   static Stream<NDEFTag> writeNDEF(
-    NDEFMessage newMessage, {
-
+    NDEFMessage newMessage,
+    bool makeReadOnly, {
     /// once will stop reading after the first tag has been read.
     bool once = false,
 
@@ -171,7 +171,7 @@ class NFC {
         NDEFMessage message = msg;
         if (message.tag.writable) {
           try {
-            await message.tag.write(newMessage);
+            await message.tag.write(newMessage, makeReadOnly);
           } catch (err) {
             controller.addError(err);
             controller.close();
@@ -270,6 +270,7 @@ enum MessageType {
 
 abstract class NFCMessage {
   MessageType get messageType;
+
   String? get id;
 
   NFCTag get tag;
@@ -277,6 +278,7 @@ abstract class NFCMessage {
 
 abstract class NFCTag {
   String? get id;
+
   bool get writable;
 }
 
@@ -487,7 +489,7 @@ class NDEFTag implements NFCTag {
 
   NDEFTag._internal(this.id, this.writable);
 
-  Future write(NDEFMessage message) async {
+  Future write(NDEFMessage message, bool makeReadOnly) async {
     if (!writable) {
       throw NFCTagUnwritableException();
     }
@@ -496,6 +498,7 @@ class NDEFTag implements NFCTag {
         // TODO: Is id ever used by the native layer?
         "id": id,
         "message": message._toMap(),
+        "makeReadOnly": makeReadOnly
       });
     } on PlatformException catch (e) {
       switch (e.code) {
