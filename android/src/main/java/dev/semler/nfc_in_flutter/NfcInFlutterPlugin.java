@@ -124,7 +124,8 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
                         break;
                     }
                     boolean makeReadOnly = (boolean) writeArgs.get("makeReadOnly");
-                    writeNDEF(messageMap, makeReadOnly);
+                    NdefMessage message = formatMapToNDEFMessage(messageMap);
+                    writeNDEF(message, makeReadOnly);
                     result.success(null);
                 } catch (NfcInFlutterException e) {
                     result.error(e.code, e.message, e.details);
