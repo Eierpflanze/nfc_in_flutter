@@ -123,13 +123,12 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
                         result.error("NFCMissingNDEFMessage", "a ndef message was not given", null);
                         break;
                     }
-                    NdefMessage message = formatMapToNDEFMessage(messageMap);
-                    Map messageMap = (Map) writeArgs.get("makeReadOnly");
-                    if (messageMap == null) {
+                    boolean makeReadOnly = (boolean) writeArgs.get("makeReadOnly");
+                    if (makeReadOnly == null) {
                         result.error("NFCMissingArguments", "makeReadOnly was not set", null);
                         break;
                     }
-                    writeNDEF(message);
+                    writeNDEF(message, makeReadOnly);
                     result.success(null);
                 } catch (NfcInFlutterException e) {
                     result.error(e.code, e.message, e.details);
