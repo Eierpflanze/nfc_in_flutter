@@ -624,8 +624,6 @@ public class NfcInFlutterPlugin implements MethodCallHandler,
                         ndef.makeReadOnly();
                     } catch (IOException e) {
                         throw new NfcInFlutterException("IOError", "write to tag error: " + e.getMessage(), null);
-                    } catch (FormatException e) {
-                        throw new NfcInFlutterException("NDEFBadFormatError", e.getMessage(), null);
                     }
                 }
             } catch (IOException e) {
